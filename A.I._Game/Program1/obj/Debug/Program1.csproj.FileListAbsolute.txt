@@ -1,0 +1,7 @@
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\obj\Debug\Program1.csproj.AssemblyReference.cache
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\obj\Debug\Program1.csproj.CoreCompileInputs.cache
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\bin\Debug\Program1.exe.config
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\bin\Debug\Program1.exe
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\bin\Debug\Program1.pdb
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\obj\Debug\Program1.exe
+C:\Users\szalas241\OneDrive - BGSzC Pestszentlőrinci Technikum\25-26\IKT\A.I._Game\Program1\obj\Debug\Program1.pdb
