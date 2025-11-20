@@ -1,0 +1,297 @@
+using System;
+using System.Linq;
+
+class TicTacToe
+{
+    // A játék táblája – 9 mező (3x3)
+    static char[] board = new char[9];
+
+    // A játékos és a számítógép jele
+    static char human = 'X';
+    static char computer = 'O';
+
+    static void Main()
+    {
+        // Kimeneti kódolás beállítása, hogy az ékezetes karakterek is jól jelenjenek meg
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        bool playAgain = true; // változó, ami tárolja, hogy akar-e új kört a játékos
+
+        while (playAgain) // amíg a játékos újra akar játszani
+        {
+            InitBoard(); // tábla inicializálása (1–9 számok)
+            Console.Clear(); // képernyő törlése
+            Console.WriteLine("=== Tic-Tac-Toe (Amőba) ===");
+            Console.WriteLine("1) Két játékos");
+            Console.WriteLine("2) Játékos vs. Számítógép (AI)");
+            Console.Write("Válassz módot (1 vagy 2): ");
+            var mode = Console.ReadLine(); // beolvassuk a választott módot
+
+            // A választott mód alapján indítjuk a játékot
+            if (mode == "1")
+                PlayTwoPlayers(); // kétjátékos mód
+            else
+                PlayVsComputer(); // gép elleni mód
+
+            // Kör vége után megkérdezzük, hogy újra akar-e játszani
+            Console.WriteLine();
+            Console.Write("Szeretnél egy új kört kezdeni? (i/n): ");
+            string ans = Console.ReadLine()?.Trim().ToLower() ?? "";
+            playAgain = ans == "i" || ans == "igen"; // ha igen → új kör indul
+        }
+
+        // Ha nem akar új kört, akkor kilép
+        Console.WriteLine("Köszönöm, hogy játszottál! Nyomj egy gombot a kilépéshez...");
+        Console.ReadKey(); // vár egy gombnyomásra, hogy ne záródjon be azonnal
+    }
+
+    // A játékmező feltöltése 1–9 karakterekkel
+    static void InitBoard()
+    {
+        for (int i = 0; i < 9; i++) board[i] = (char)('1' + i);
+    }
+
+    // A tábla kirajzolása a képernyőre
+    static void DrawBoard()
+    {
+        Console.Clear(); // képernyő törlése
+        Console.WriteLine("Amőba tábla (helyek: 1-9)");
+        Console.WriteLine();
+        // A 3x3-as tábla megjelenítése
+        Console.WriteLine($" {board[0]} | {board[1]} | {board[2]} ");
+        Console.WriteLine("---+---+---");
+        Console.WriteLine($" {board[3]} | {board[4]} | {board[5]} ");
+        Console.WriteLine("---+---+---");
+        Console.WriteLine($" {board[6]} | {board[7]} | {board[8]} ");
+        Console.WriteLine();
+    }
+
+    // Ellenőrzi, hogy egy játékos nyert-e
+    static bool IsWinner(char[] b, char player)
+    {
+        // Az összes lehetséges győztes kombináció indexei
+        int[,] wins = {
+            {0,1,2}, {3,4,5}, {6,7,8}, // sorok
+            {0,3,6}, {1,4,7}, {2,5,8}, // oszlopok
+            {0,4,8}, {2,4,6}           // átlók
+        };
+
+        // Végigmegyünk az összes győzelmi mintán
+        for (int i = 0; i < wins.GetLength(0); i++)
+        {
+            // Ha az adott sor/oszlop/átló mindhárom mezőjén ugyanaz a játékos van → nyert
+            if (b[wins[i,0]] == player && b[wins[i,1]] == player && b[wins[i,2]] == player)
+                return true;
+        }
+        return false; // különben nem nyert
+    }
+
+    // Ellenőrzi, hogy a tábla megtelt-e
+    static bool IsBoardFull(char[] b)
+    {
+        return b.All(c => c == 'X' || c == 'O'); // minden mező foglalt?
+    }
+
+    // Kétjátékos mód logikája
+    static void PlayTwoPlayers()
+    {
+        InitBoard(); // új tábla
+        char current = 'X'; // az X-es játékos kezd
+
+        while (true)
+        {
+            DrawBoard(); // tábla kirajzolása
+            Console.WriteLine($"Játékos {current} lép.");
+            int pos = ReadMove(); // beolvassuk, hova lép
+
+            // ha a mező már foglalt, új próbálkozás
+            if (board[pos] == 'X' || board[pos] == 'O')
+            {
+                Console.WriteLine("Ide már léptek. Nyomj egy gombot és próbáld újra...");
+                Console.ReadKey();
+                continue;
+            }
+
+            board[pos] = current; // a játékos lépése bekerül a táblába
+
+            // Ellenőrizzük, hogy nyert-e
+            if (IsWinner(board, current))
+            {
+                DrawBoard();
+                Console.WriteLine($"Gratulálok! Játékos {current} nyert!");
+                break;
+            }
+
+            // Ellenőrizzük, hogy megtelt-e a tábla
+            if (IsBoardFull(board))
+            {
+                DrawBoard();
+                Console.WriteLine("Döntetlen!");
+                break;
+            }
+
+            // Másik játékos következik
+            current = (current == 'X') ? 'O' : 'X';
+        }
+    }
+
+    // Gép elleni mód logikája
+    static void PlayVsComputer()
+    {
+        InitBoard(); // új tábla
+        Console.Write("Szeretnél Te kezdeni? (i/n): ");
+        var s = Console.ReadLine();
+        bool humanStarts = s != null && s.Trim().ToLower().StartsWith("i"); // ha igen → ember kezd
+
+        char current = humanStarts ? human : computer; // kezdő játékos
+
+        while (true)
+        {
+            DrawBoard(); // tábla kirajzolása
+
+            if (current == human)
+            {
+                // Ember lép
+                Console.WriteLine("A Te lépésed.");
+                int pos = ReadMove();
+
+                // Ellenőrizzük, hogy a mező üres-e
+                if (board[pos] == 'X' || board[pos] == 'O')
+                {
+                    Console.WriteLine("Ide már léptek. Nyomj egy gombot és próbáld újra...");
+                    Console.ReadKey();
+                    continue;
+                }
+                board[pos] = human; // játékos lép
+            }
+            else
+            {
+                // Számítógép lép
+                Console.WriteLine("A számítógép gondolkodik...");
+                int best = GetBestMove(board, computer); // minimax algoritmussal kiszámítja a legjobb lépést
+                board[best] = computer;
+            }
+
+            // Ellenőrizzük, hogy valaki nyert-e
+            if (IsWinner(board, current))
+            {
+                DrawBoard();
+                if (current == human) Console.WriteLine("Gratulálok! Te nyertél!");
+                else Console.WriteLine("A számítógép nyert. Próbáld újra!");
+                break;
+            }
+
+            // Ha megtelt a tábla, döntetlen
+            if (IsBoardFull(board))
+            {
+                DrawBoard();
+                Console.WriteLine("Döntetlen!");
+                break;
+            }
+
+            // Váltás a másik játékosra
+            current = (current == 'X' || current == human) ? computer : human;
+        }
+    }
+
+    // A játékos mezőválasztásának beolvasása és ellenőrzése
+    static int ReadMove()
+    {
+        while (true)
+        {
+            Console.Write("Válassz mezőt (1-9): ");
+            string input = Console.ReadLine();
+
+            // Ellenőrizzük, hogy számot írt-e be
+            if (!int.TryParse(input, out int n))
+            {
+                Console.WriteLine("Érvénytelen szám.");
+                continue;
+            }
+
+            // Ellenőrizzük, hogy a szám 1 és 9 között van-e
+            if (n < 1 || n > 9)
+            {
+                Console.WriteLine("A számnak 1 és 9 között kell lennie.");
+                continue;
+            }
+
+            return n - 1; // a mezők indexe 0-tól indul (ezért -1)
+        }
+    }
+
+    // A gép számára a legjobb lépést adja vissza a minimax algoritmussal
+    static int GetBestMove(char[] b, char player)
+    {
+        int bestScore = int.MinValue; // legjobb pontszám
+        int bestMove = -1; // legjobb lépés helye
+
+        // Végigmegyünk az összes üres mezőn
+        for (int i = 0; i < 9; i++)
+        {
+            if (b[i] != 'X' && b[i] != 'O')
+            {
+                char[] copy = (char[])b.Clone(); // másolat a tábláról
+                copy[i] = player; // kipróbáljuk, mi lenne, ha ide lépne
+                int score = Minimax(copy, false, player); // kiszámoljuk az értéket
+
+                // ha ez jobb, mint az eddigi legjobb, eltároljuk
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestMove = i;
+                }
+            }
+        }
+
+        // ha valamiért nem talált üres mezőt (nem kéne, hogy előforduljon)
+        if (bestMove == -1)
+            bestMove = Enumerable.Range(0, 9).First(i => b[i] != 'X' && b[i] != 'O');
+
+        return bestMove; // visszaadjuk a legjobb mezőt
+    }
+
+    // Minimax algoritmus – rekurzív keresés a legjobb lépés megtalálására
+    static int Minimax(char[] b, bool isMaximizing, char maximizingPlayer)
+    {
+        char minimizingPlayer = (maximizingPlayer == 'X') ? 'O' : 'X'; // az ellenfél jele
+
+        // Ha a maximáló (számítógép) nyert → +10 pont
+        if (IsWinner(b, maximizingPlayer)) return +10;
+        // Ha az ellenfél nyert → -10 pont
+        if (IsWinner(b, minimizingPlayer)) return -10;
+        // Ha tele a tábla → döntetlen → 0 pont
+        if (IsBoardFull(b)) return 0;
+
+        if (isMaximizing)
+        {
+            int best = int.MinValue; // legjobb pontszám a számítógép számára
+            for (int i = 0; i < 9; i++)
+            {
+                if (b[i] != 'X' && b[i] != 'O')
+                {
+                    char[] copy = (char[])b.Clone();
+                    copy[i] = maximizingPlayer; // gép lép
+                    int val = Minimax(copy, false, maximizingPlayer); // ellenfél válaszlépése
+                    best = Math.Max(best, val); // a legnagyobb értéket keressük
+                }
+            }
+            return best - 1; // kisebb számot adunk, hogy előnyben részesítse a gyors győzelmet
+        }
+        else
+        {
+            int best = int.MaxValue; // legjobb pontszám az ember számára
+            for (int i = 0; i < 9; i++)
+            {
+                if (b[i] != 'X' && b[i] != 'O')
+                {
+                    char[] copy = (char[])b.Clone();
+                    copy[i] = minimizingPlayer; // ember lép
+                    int val = Minimax(copy, true, maximizingPlayer); // gép válasza
+                    best = Math.Min(best, val); // a legkisebb értéket keressük (ember próbál veszteséget minimalizálni)
+                }
+            }
+            return best + 1; // késleltetett vereség preferálása
+        }
+    }
+}
